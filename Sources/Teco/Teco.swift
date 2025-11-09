@@ -33,7 +33,7 @@ public class Terminal {
     }()
     
     @inline(__always)
-    static private func rawWrite(_ string: UnsafePointer<CChar>!, via stream: WritableStream) {
+    static private func rawWrite(_ string: UnsafePointer<CChar>, via stream: WritableStream) {
         let file = switch stream {
         case .output:
             stdout
@@ -122,7 +122,7 @@ public class Terminal {
     ///
     /// - Parameter stream: the stream being targeted.
     @inline(__always)
-    static public func print(via stream: WritableStream = .output) throws {
+    static public func print(via stream: WritableStream = .output) {
         rawWrite("\n", via: stream)
     }
     
@@ -402,7 +402,7 @@ public class Terminal {
             fragments = stringInterpolation.fragments
         }
         
-        /// Retrieves the concatenation of the strings its fragments have, very likely allocating on the heap.
+        /// Retrieves the concatenation of the strings its fragments have, allocating the result on the heap.
         ///
         /// Fragments that specifies custom paddings will have their strings with them applied.
         public var string: String {
@@ -627,8 +627,6 @@ public extension Terminal.StyledFragment {
     }
     
     /// Returns a copy of the current fragment setting ANSI bright black as the background color.
-    ///
-    /// This color is usually a darker shade of the foreground, useful for subtle highlights.
     @inline(__always)
     var onGray: Terminal.StyledFragment {
         appendingStyle(background: .gray)
@@ -918,8 +916,6 @@ public extension String {
     }
     
     /// Creates a styled fragment from the current string setting ANSI bright black as the background color.
-    ///
-    /// This color is usually a darker shade of the foreground, useful for subtle highlights.
     @inline(__always)
     var onGray: Terminal.StyledFragment {
         .init(self, style: .init(background: .gray))
