@@ -1,244 +1,235 @@
 # Teco
 ## About
-A terminal manipulation Swift library for building simple macOS command-line tools—that parse arguments, perform a task, and print results—, making it perfect for system maintenance workflows. It requires Swift 6.2 and macOS 14 Sonoma or newer.
+A terminal manipulation Swift library for building macOS command-line tools. It requires Swift 6.2 and can target macOS 14 Sonoma or later.
 
 ## Install
 ### Swift Package Manager
-Adapting it to your case:
 - Add it to your package dependencies:
 
 ```swift
-dependencies: [
-    .package(url: "https://github.com/skippyr/Teco", from: "1.0.0")
-],
+.package(url: "https://github.com/skippyr/Teco", from: "1.0.0")
 ```
 
-- Make the desired targets use it:
+- Make the desired targets depend on it:
 
 ```swift
-targets: [
-    .executableTarget(
-        name: "App",
-        dependencies: ["Teco"]
-    )
-]
+dependencies: ["Teco"]
 ```
 
 ### Xcode Project
-- Open your project settings.
+- Open your target settings.
 - Click on the `+` button under the `General > Frameworks and Libraries` section.
 - Use the `Add Other...` dropdown menu at the bottom left corner, selecting the `Add Package Dependency...` option.
 - Use the `Search or Enter Package URL` search bar at the top right corner to search for the `https://github.com/skippyr/Teco` repository.
-- Select the `Teco` package in the result list and click on the `Add Package` button at the bottom right corner.
+- Select the `teco` package in the result list and click on the `Add Package` button at the bottom right corner.
 - Choose the desired targets to be using it and click on the `Add Package` button again.
+- For the best experience, if possible, ensure your project uses `Swift 6` as the language version under its `Build Settings`.
 
 ## Usage
-This section will give you an overview about the library. For more details, refer to the documentation of its components by holding the Option key and clicking on them on Xcode.
+This section will give you an overview about the library. For more details, refer to the documentation of its components on Xcode.
 
-### Import & Thread Safety Note
-The main component brought to scope is the `Terminal` class, which is as a handle for manipulating the emulated terminal. To ensure thread safety when building UI and accessing cached values, you can only use it within the main actor concurrency domain.
+### Debug
+Whenever you're using this library, debug your software using the Terminal app instead of Xcode, because its embedded console doesn't support any of the added features.
 
-For that, it's highly recommended you use modern Swift annotations such as `@main` and `@MainActor` to denotate your software entry point and UI/terminal manipulation functions, respectively—which both should run in the main thread—reducing code and mitigating date races—for beginners, also worth to mention you cannot use `@main` within a file named `main.swift`.
+### Import
+In order to start using it, you must import the `Teco` module at the top of your Swift files:
 
 ```swift
-// App.swift
-//
-// But this can be any name other than main.swift.
-
 import Teco
-import Foundation
+```
 
-@main
-struct App {
-    @MainActor
-    static func foo() {
-        // Write UI/terminal manipulation code in functions annotated with
-        // @MainActor.
+### Thread Safety
+The primary component introduced into scope is the `Terminal` enum, which is as a handle for manipulating the emulated terminal. To ensure thread safety for building TUI and accessing its cached contents, you can only use it within the main actor concurrency domain—the main thread.
 
-        // ...
-    }
+Take advantage of modern annotations such as `@main` and `@MainActor` in your software to make it thread safer and be able to use the library without too much ceremony.
 
-    static func main() {
-        // The main function in objects annotated with @main is always run
-        // within the main actor domain.
-        //
-        // You can access Teco features and @MainActor functions here without
-        // awaiting them.
+All examples in this documentation are implicitly within that domain.
 
-        // ...
-    }
+### Streams
+#### Printing
+Use the `Terminal.print` method to write to a writable stream—standard output (by default) or standard error (if specified). In this context, it behaves similarly to the standard Swift `print` function, but it's also capable of applying the styles embedded in your strings, automatically removing them—except padding—from the output if the stream is redirected.
+
+```swift
+Terminal.print("(output) Here Be Dragons!".blue)
+Terminal.print("(error) Here Be Dragons!".red, via: .error)
+```
+
+The styling behavior is further influenced by the booleans `Terminal.shouldApplyColors` and `Terminal.shouldApplyStyles`. Modify these variables to implement custom behavior in your software, for example, to allow your user to set its preferences using options:
+
+```swift
+for argument in CommandLine.arguments
+  .dropFirst()
+  .map({ $0.trimmingCharacters(in: .newlines) }) {
+  if argument == "--no-color" {
+    Terminal.shouldApplyColors = false
+    continue
+  } else if argument == "--no-ansi" {
+    Terminal.shouldApplyStyles = false
+    continue
+  }
 }
 ```
 
-If you still prefer to use top-level code within the `main.swift` file, write your code within `MainActor.run` and await its completion.
+#### Redirections
+The `Terminal` enum caches whether the streams are being redirected. Check it to ensure your software has the appropriate environment for it to run:
 
 ```swift
-// main.swift
-
-await MainActor.run {
-    // ...
+guard !Terminal.isInputRedirected else {
+  throwError("the input stream cannot be redirected.")
 }
 ```
 
-All examples throughout this documentation will implicitly assume you run them via the main actor using one of the methods described above.
-
-### Printing
-Use the `Terminal.print` method for writing to writable streams. It works similar to the standard `print` function.
-
 ```swift
-// Without specifying a stream using the `via:` label, it considers the terminal
-// output stream.
-Terminal.print("(output) Here Be Dragons!")
-
-// Not providing an argument, makes it print the newline sequence.
-Terminal.print()
-
-// You can manually specify you want to write to the terminal error stream.
-Terminal.print("(error) Here Be Dragons!", via: .error)
-
-// It can print `Any` type by converting it to its string description.
-//
-// Implement the `CustomStringConvertible` protocol to your types for custom
-// output.
-Terminal.print(30)
+guard !Terminal.isOutputRedirected && !Terminal.isErrorRedirected else {
+  throwError("the output streams cannot be redirected.")
+}
 ```
 
 ### Styles
-Inspired by libraries such as [Rainbow](http://github.com/onevcat/Rainbow) and [ANSIKit](https://github.com/tornikegomareli/ANSIKit), Teco associates strings with styles using extension methods and string interpolation. However, instead of appending ANSI sequences to your strings in place, it uses dedicated types that allows you to create and reuse styles (`Terminal.Style`), styled fragments (`Terminal.StyledFragment`) and styled strings (`Terminal.StyledString`) throughout your apps, giving you more flexibility.
+#### Types
+The library adds three new types you need to learn to handle styles:
+- `Terminal.Style`: contains a set of optional text style attributes you can apply to strings.
+- `Terminal.StyledFragment`: associates a string with a style.
+- `Terminal.StyledString`: glues styled fragments in order—like an array—to create a text, possibly with mixed styles.
 
-A style is a set of properties that define the appearance of a single string fragment. A styled fragment is a type that relates a string with a style. And, finally, a styled string glues fragments together to create a complete text, which may contain different styles mixed.
+Styles can affect text properties such as foreground and background colors, effects, padding, and font weight. They can be stored in variables and applied to strings using the `style` method, or you can configure each property individually through additional extensions:
 
 ```swift
-// You can define custom styles to later associate it with strings.
-let customStyle = Terminal.Style(foreground: .yellow, effects: [.underline])
+let customStyle = Terminal.Style(foreground: .blue)
+Terminal.print("Here Be Dragons!".style(customStyle))
+Terminal.print("Here Be Dragons!".red.bold.underline, via: .error)
+```
 
-// Alternatively, you can directly associate a style with a string using
-// extension methods, therefore creating a styled fragment.
+Note that most common way of creating style fragments and styled strings is by using extension methods and string interpolation, respectively:
+
+```swift
+let styledFragment = "Dragons!".yellow
+let styledString: Terminal.StyledString = "\("Here".red) \("Be".onGreen.bold) \(styledFragment)!"
+```
+
+Styled strings implement a custom string interpolation parsing algorithm that splits a text into a list of styled fragments stored internally. Therefore, in the example above, the `styledString` variable ends up composed by 6 styled fragments:
+1. `"Here"` with ANSI red foreground.
+1. `" "` with blank style.
+1. `"Be"` with ANSI green background and bold effect.
+1. `" "` with blank style.
+1. `"Dragons"` (from the `styledFragment` variable) with ANSI yellow foreground.
+1. `!` with blank style.
+
+Styled strings are the perfect type for function parameters. Convert styled fragments and strings to it using its constructor. String literals can be automatically converted if that type is made explicit or implicitly deductible by the context.
+
+```swift
+@MainActor
+static func logError(_ message: Terminal.StyledString) {
+  Terminal.print("\("error:".red.bold) \(message)", via: .error)
+}
+```
+
+```swift
 let styledFragment = "Dragons".red.bold
-// This one associates "Dragons" with red foreground and bold font weight.
-
-// Finally, you can interpolate strings and styled fragments, glueing them
-// together, forming a styled string.
-//
-// Note, the custom style previously create is used here.
-let styledString = "\(Here.style(customStyle)) \("Be".yellow) \(styledFragment)!"
-// This styled string, for example, is composed by 6 styled fragments:
-//     1. "Here" with yellow foreground and underline effect (defined by
-//        `customStyle` style).
-//     2. " " with blank style.
-//     3. "Be" with yellow foreground.
-//     4. " " with blank style.
-//     5. "Dragons" with red foreground and bold font weight (stored in
-//        `styledFragment` variable).
-//     6. "!" with blank style.
-
-// Use `Terminal.print` to print your styled strings with them applied.
-Terminal.print(styledString)
+let string = "Here Be Dragons!"
+let styledStringFromFragment = Terminal.StyledString(styledFragment)
+let styledStringFromString = Terminal.StyledString(string)
+let styledStringFromLiteral: Terminal.StyledString = "Here Be Dragons!"
 ```
 
-> [!IMPORTANT]
-> The Xcode built-in console emulates the `dumb` terminal. It doesn't render styles neither supports advanced features.
->
-> For debugging purposes, always prefer to use the Terminal app. And if you have installed a custom profile for it, worth ensuring it still configured to declare itself as `xterm-256color` under its settings `Profiles > Advanced` tab.
+Strings can also be converted to styled fragments through its constructor. When not using extension methods, the resulting fragments have blank styles. Internally, styled strings invoke this constructor when handling interpolations of strings and literals.
 
-Often, fragments and strings are converted to styled strings using its constructor, while string literals can be automatically converted by specifying the type. Styled strings can be concatenated and interpolated—but deep nesting is error prone because Swift, without type annotation, infers string literals are just regular strings. At any time, you can access the underlying string being wrapped using the `string` method.
+Use the `string` computed property to access the underlying text of a styled fragment or styled string. Fragments return the string they are wrapping directly, while styled strings concatenate the text of their fragments, requiring a heap allocation:
 
 ```swift
-// Convert styled fragments and string literals to styled strings using its
-// constructor.
-let styledStringFromFragment = Terminal.StyledString("Here Be Dragons!".red)
-let styledStringFromString = Terminal.StyledString("Here Be Dragons!")
-// Alternatively, a string literal can be automatically casted if you make the
-// type explicit.
-let styledStringFromStringLiteral: Terminal.StyledString = "Here Be Dragons!"
-
-// Accessing the string from a styled fragment is simply accessing the value
-// being wrapped—without performance costs.
-let fragment = "Here Be Dragons".red
-Terminal.print(fragment.string)
-// In contrast, accessing the string from a styled string allocates on the heap,
-// because it needs to concatenate the text from its fragments to synthesize it
-// completely.
-//
-// It's a good idea to save it to a variable if you need to manipulate it more
-// than once.
-let styledString = "\(fragment)\("!".yellow)"
-Terminal.print(styledString.string)
+let message = "Here Be Dragons!".red.bold
+Terminal.print("Total Characters: \(message.string.count).")
 ```
 
-Styles can affect colors, font weight, effects and padding. Both ANSI 256 color palette and RGB colors from sRGB color space are supported. The true magic happens within the `Terminal.print`, as it's the responsible for parsing the fragments in your styled strings and converting their styles to ANSI escape sequences during runtime.
+#### Colors
+The library supports setting colors of the ANSI 256 color palette and RGB colors within the sRGB color profile as the terminal foreground and background colors. These color formats are contained within the `Terminal.Color` enum.
+
+A `Terminal.ANSIColor` is an alias for an `UInt8` value. The first 16 colors of this palette are defined by the terminal theme and have names. The most common ones are implemented as static values in that enum:
+- `.black`: the ANSI black color (same as `.ansi(0)`).
+- `.red`: the ANSI red color (same as `.ansi(1)`).
+- `.green`: the ANSI green color (same as `.ansi(2)`).
+- `.yellow`: the ANSI yellow color (same as `.ansi(3)`).
+- `.blue`: the ANSI blue color (same as `.ansi(4)`).
+- `.magenta`: the ANSI magenta color (same as `.ansi(5)`).
+- `.cyan`: the ANSI cyan color (same as `.ansi(6)`).
+- `.white`: the ANSI bright white color (same as `.ansi(15)`).
+- `.gray`: the ANSI bright black color (same as `.ansi(8)`).
+
+A `Terminal.SRGBColor` color contains the RGB components of a color defined within the sRGB color space, and it can be created using its constructor:
+
+```swift
+let yellow = Terminal.SRGBColor(red: 255, green: 255, blue: 0)
+```
+
+Apply colors using the extension methods `ansi`, `onANSI`, `sRGB`, `onSRGB`, `color` or one with the name of an ANSI color previously mentioned. The prefix `on` is used for methods that apply to the background.
+
+```swift
+let text = "Here Be Dragons!"
+Terminal.print("""
+  \(text.red) \(text.onRed)
+  \(text.color(.srgb(yellow), at: .foreground))
+  """)
+```
+
+#### Font Weight
+This feature historically controls the text brightness/color intensity, but most modern terminals now make it also affect the font weight. The `Terminal.Weight` enum defines the available weight options. You can adjust the appearance of your text by using the `bold` and `dim` computed properties or the `weight` method:
 
 ```swift
 Terminal.print("""
-    \("In memory of all fellow dragons,".bold.red)
-    \("whose dreams".blue.bold) keep our \("flames alive".srgb(red: 255, green: 128, blue: 0))
-    \("forever".invertedLayers) \("keeping".underline.pad(.left, by: 10)) our \("cave apart".yellow).
-    """)
+  \(text.bold)
+  \(text.weight(.dim))
+  """)
 ```
 
-Styles, except padding, are automatically removed if the stream specified to `Terminal.print` is redirected or the styled strings are cast to regular strings. Additionaly, by default, styles are not applied if the environment variable `NO_COLOR` is set or if the terminal identifier (hold by the `TERM` environment variable) is `dumb`—meaning no capabilities are supported. You can override this preference (`Terminal.shouldApplyStyles`), for example, to also be controlled by a custom CLI option:
+The bold weight may be rendered with bold font and/or bright colors, and the dim weight makes the colors of your text faint.
+
+#### Effects
+Make your text fancier using effects. Available effects—the most supported ones—are containined within the `Terminal.Effect` enum:
+- `italic`: makes the text use italic font.
+- `underline`: draws a horizontal line below the text.
+- `blinking`: makes the text blink in slow pace.
+- `invertedLayers`: inverts the colors used in the foreground and background layers.
+- `strikethrough`: draws a horizontal line through the text.
+
+Apply styles using the `effects` method or computed properties that match the names listed above:
 
 ```swift
-CommandLine.arguments
-    .dropFirst()
-    .map { $0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) }
-    .forEach { argument in
-        if argument == "--no-color" {
-            // Disables styles if the `--no-color` CLI option is used among the
-            // command-line arguments.
-            Terminal.shouldApplyStyles = false
-            return
-        } else if argument == "-h" || argument == "--help" {
-            // writeHelp()
-            exit(EXIT_SUCCESS)
-        }
-    }
+let customEffects: Set<Terminal.Effect> = [.italic, .underline]
+let text = "Here Be Dragons!"
+Terminal.print("""
+  \(text.invertedLayers)
+  \(text.effects(customEffects)
+  """)
 ```
 
-### Streams
-The `Terminal` class caches whether the streams are being redirected. Even though, these values can technically stale, that's very unlikely to happen for most apps—making it a reasonable approach to improve performance. You can access those values and perform checks to guarantee your app is be able to use them.
+#### Padding
+Align texts in your TUIs using the `padding` method, specifying the alignment for the text, the character to pad with, and how much cells to have filled, including your text area:
 
 ```swift
-// For interactive apps, you can check for the input stream.
-guard !Terminal.isInputRedirected else {
-    Terminal.print("error: the input stream cannot be redirected.", via: .error)
-    exit(EXIT_FAILURE)
-}
-
-// Otherwise, you can check for a set of output streams.
-guard !Terminal.isOutputRedirected && !Terminal.isErrorRedirected else {
-    Terminal.print("error: the output streams cannot be redirected.", via: .error)
-    exit(EXIT_FAILURE)
-}
+let customPadding = Terminal.Padding(.left, by: 80)
+let text = "Here Be Dragons!"
+Terminal.print("""
+  \(text.onMagenta.pad(.center, by: 80))
+  \(text.onYellow.pad(using: customPadding))
+  \(text.onBlue.pad(.right, with: "-", by: 80))
+  """)
 ```
 
+## Window
 ### Dimensions
-Finally, the dimensions of the terminal window can be retrieved for building UIs that adapt to the available space:
+The dimensions of the terminal window can be retrieved for building TUIs that adapt to the available space or ensuring your software has the space it needs to run:
 
 ```swift
 guard let dimensions = try? Terminal.dimensions else {
-    Terminal.print("error: cannot retrieve the dimensions of the terminal window.", via: .error)
-    exit(EXIT_FAILURE)
+  throwError("error: cannot retrieve the dimensions of the terminal window.", via: .error)
 }
-
-// Print the dimensions for debugging.
+guard dimensions >= 80 else {
+  throwError("the terminal window needs to have, at least, 80 columns.")
+}
 Terminal.print("""
-    Total Columns: \(dimensions.totalColumns)
-    Total Rows: \(dimensions.totalRows)
-    """)
-
-// Check if the dimensions have the minimum size for your UI.
-guard dimensions.totalColumns < 80 else {
-    Terminal.print("error: cannot retrieve the dimensions of the terminal window.", via: .error)
-    exit(EXIT_FAILURE)
-}
-
-// Alternatively, adapt your UI to the available space.
-if dimensions.totalColumns > 100 {
-    // printLargeUI()
-} else {
-    // printSmallUI()
-}
+  Total Columns: \(dimensions.totalColumns)
+  Total Rows: \(dimensions.totalRows)
+  """)
 ```
 
 ## Help
