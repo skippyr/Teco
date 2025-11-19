@@ -1,3 +1,6 @@
 {
-  "respectsExistingLineBreaks": false
+  "indentation": {
+    "spaces": 4
+  },
+  "lineLength": 120
 }

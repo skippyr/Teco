@@ -7,13 +7,21 @@ A terminal manipulation Swift library for building macOS command-line tools. It 
 - Add it to your package dependencies:
 
 ```swift
-.package(url: "https://github.com/skippyr/Teco", from: "1.0.0")
+dependencies: [
+    .package(
+        url: "https://github.com/skippyr/Teco",
+        from: "1.0.0"
+    )
+]
 ```
 
 - Make the desired targets depend on it:
 
 ```swift
-dependencies: ["Teco"]
+.executableTarget(
+    name: "YourApp",
+    dependencies: ["Teco"]
+)
 ```
 
 ### Xcode Project
@@ -60,13 +68,13 @@ The styling behavior is further influenced by the booleans `Terminal.shouldApply
 for argument in CommandLine.arguments
   .dropFirst()
   .map({ $0.trimmingCharacters(in: .newlines) }) {
-  if argument == "--no-color" {
-    Terminal.shouldApplyColors = false
-    continue
-  } else if argument == "--no-ansi" {
-    Terminal.shouldApplyStyles = false
-    continue
-  }
+    if argument == "--no-color" {
+        Terminal.shouldApplyColors = false
+        continue
+    } else if argument == "--no-ansi" {
+        Terminal.shouldApplyStyles = false
+        continue
+    }
 }
 ```
 
@@ -75,13 +83,13 @@ The `Terminal` enum caches whether the streams are being redirected. Check it to
 
 ```swift
 guard !Terminal.isInputRedirected else {
-  throwError("the input stream cannot be redirected.")
+    throwError("the input stream cannot be redirected.")
 }
 ```
 
 ```swift
 guard !Terminal.isOutputRedirected && !Terminal.isErrorRedirected else {
-  throwError("the output streams cannot be redirected.")
+    throwError("the output streams cannot be redirected.")
 }
 ```
 
@@ -120,7 +128,7 @@ Styled strings are the perfect type for function parameters. Convert styled frag
 ```swift
 @MainActor
 static func logError(_ message: Terminal.StyledString) {
-  Terminal.print("\("error:".red.bold) \(message)", via: .error)
+    Terminal.print("\("error:".red.bold) \(message)", via: .error)
 }
 ```
 
@@ -165,20 +173,22 @@ Apply colors using the extension methods `ansi`, `onANSI`, `sRGB`, `onSRGB`, `co
 
 ```swift
 let text = "Here Be Dragons!"
-Terminal.print("""
-  \(text.red) \(text.onRed)
-  \(text.color(.srgb(yellow), at: .foreground))
-  """)
+Terminal.print(
+    """
+    \(text.red) \(text.onRed)
+    \(text.color(.srgb(yellow), at: .foreground))
+    """)
 ```
 
 #### Font Weight
 This feature historically controls the text brightness/color intensity, but most modern terminals now make it also affect the font weight. The `Terminal.Weight` enum defines the available weight options. You can adjust the appearance of your text by using the `bold` and `dim` computed properties or the `weight` method:
 
 ```swift
-Terminal.print("""
-  \(text.bold)
-  \(text.weight(.dim))
-  """)
+Terminal.print(
+    """
+    \(text.bold)
+    \(text.weight(.dim))
+    """)
 ```
 
 The bold weight may be rendered with bold font and/or bright colors, and the dim weight makes the colors of your text faint.
@@ -196,10 +206,11 @@ Apply styles using the `effects` method or computed properties that match the na
 ```swift
 let customEffects: Set<Terminal.Effect> = [.italic, .underline]
 let text = "Here Be Dragons!"
-Terminal.print("""
-  \(text.invertedLayers)
-  \(text.effects(customEffects)
-  """)
+Terminal.print(
+    """
+    \(text.invertedLayers)
+    \(text.effects(customEffects)
+    """)
 ```
 
 #### Padding
@@ -208,11 +219,12 @@ Align texts in your TUIs using the `padding` method, specifying the alignment fo
 ```swift
 let customPadding = Terminal.Padding(.left, by: 80)
 let text = "Here Be Dragons!"
-Terminal.print("""
-  \(text.onMagenta.pad(.center, by: 80))
-  \(text.onYellow.pad(using: customPadding))
-  \(text.onBlue.pad(.right, with: "-", by: 80))
-  """)
+Terminal.print(
+    """
+    \(text.onMagenta.pad(.center, by: 80))
+    \(text.onYellow.pad(using: customPadding))
+    \(text.onBlue.pad(.right, with: "-", by: 80))
+    """)
 ```
 
 ## Window
@@ -221,15 +233,16 @@ The dimensions of the terminal window can be retrieved for building TUIs that ad
 
 ```swift
 guard let dimensions = try? Terminal.dimensions else {
-  throwError("error: cannot retrieve the dimensions of the terminal window.", via: .error)
+    throwError("error: cannot retrieve the dimensions of the terminal window.", via: .error)
 }
 guard dimensions >= 80 else {
-  throwError("the terminal window needs to have, at least, 80 columns.")
+    throwError("the terminal window needs to have, at least, 80 columns.")
 }
-Terminal.print("""
-  Total Columns: \(dimensions.totalColumns)
-  Total Rows: \(dimensions.totalRows)
-  """)
+Terminal.print(
+    """
+    Total Columns: \(dimensions.totalColumns)
+    Total Rows: \(dimensions.totalRows)
+    """)
 ```
 
 ## Help
