@@ -1,17 +1,19 @@
 //
-//  StyledFragment+Styles.swift
-//  Teco
+//  StyledTextFragment+Styles.swift
+//  Part of the Teco project.
 //
-//  Created by Sherman Barros on 11/17/25.
+//  Created by Sherman Barros <skippyr.developer@icloud.com>
+//  Visit my website: https://dragonscave.xyz.
+//  Follow me on GitHub: https://github.com/skippyr.
+//
+//  Refer to the LICENSE file that comes in its source code for more details.
+//  If not available, all rights are reserved to the author.
 //
 
 import Foundation
 
-extension Terminal.StyledFragment {
-    fileprivate func appendingStyle(
-        foreground: Terminal.Color? = nil, background: Terminal.Color? = nil, weight: Terminal.Weight? = nil,
-        effects: Set<Terminal.Effect>? = nil, padding: Terminal.Padding? = nil
-    ) -> Terminal.StyledFragment {
+extension StyledTextFragment {
+    fileprivate func appendingStyle(foreground: Color? = nil, background: Color? = nil, weight: TextWeight? = nil, effects: Set<TextEffect>? = nil, padding: TextPadding? = nil) -> StyledTextFragment {
         var style = style
         if let foreground {
             style.foreground = foreground
@@ -35,60 +37,34 @@ extension Terminal.StyledFragment {
 
     /// Returns a copy of the current fragment setting ANSI black as the foreground color.
     ///
-    /// This color usually matches the terminal background. In light themes, it may be replaced with one closer to white.
-    public var black: Terminal.StyledFragment {
-        appendingStyle(foreground: .black)
-    }
-
+    /// This color usually matches the terminal background. In light themes, it may be replaced by a near-white shade instead of black.
+    public var black: StyledTextFragment { appendingStyle(foreground: .black) }
     /// Returns a copy of the current fragment setting ANSI red as the foreground color.
-    public var red: Terminal.StyledFragment {
-        appendingStyle(foreground: .red)
-    }
-
+    public var red: StyledTextFragment { appendingStyle(foreground: .red) }
     /// Returns a copy of the current fragment setting ANSI green as the foreground color.
-    public var green: Terminal.StyledFragment {
-        appendingStyle(foreground: .green)
-    }
-
+    public var green: StyledTextFragment { appendingStyle(foreground: .green) }
     /// Returns a copy of the current fragment setting ANSI yellow as the foreground color.
-    public var yellow: Terminal.StyledFragment {
-        appendingStyle(foreground: .yellow)
-    }
-
+    public var yellow: StyledTextFragment { appendingStyle(foreground: .yellow) }
     /// Returns a copy of the current fragment setting ANSI blue as the foreground color.
-    public var blue: Terminal.StyledFragment {
-        appendingStyle(foreground: .blue)
-    }
-
+    public var blue: StyledTextFragment { appendingStyle(foreground: .blue) }
     /// Returns a copy of the current fragment setting ANSI magenta as the foreground color.
-    public var magenta: Terminal.StyledFragment {
-        appendingStyle(foreground: .magenta)
-    }
-
+    public var magenta: StyledTextFragment { appendingStyle(foreground: .magenta) }
     /// Returns a copy of the current fragment setting ANSI cyan as the foreground color.
-    public var cyan: Terminal.StyledFragment {
-        appendingStyle(foreground: .cyan)
-    }
-
+    public var cyan: StyledTextFragment { appendingStyle(foreground: .cyan) }
     /// Returns a copy of the current fragment setting ANSI bright white as the foreground color.
     ///
-    /// This color usually matches the terminal foreground. In light themes, it may be replaced with one closer to black.
-    public var white: Terminal.StyledFragment {
-        appendingStyle(foreground: .white)
-    }
-
+    /// This color usually matches the terminal foreground. In light themes, it may be replaced by a near-black shade instead of white.
+    public var white: StyledTextFragment { appendingStyle(foreground: .white) }
     /// Returns a copy of the current fragment setting ANSI bright black as the foreground color.
     ///
     /// This color is usually a darker shade of the terminal foreground, useful for captions.
-    public var gray: Terminal.StyledFragment {
-        appendingStyle(foreground: .gray)
-    }
+    public var gray: StyledTextFragment { appendingStyle(foreground: .gray) }
 
     /// Returns a copy of the current fragment setting the ANSI color provided as the foreground color.
     ///
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
-    public func ansi(_ color: Terminal.ANSIColor) -> Terminal.StyledFragment {
+    public func ansi(_ color: ANSIColor) -> StyledTextFragment {
         appendingStyle(foreground: .ansi(color))
     }
 
@@ -96,71 +72,46 @@ extension Terminal.StyledFragment {
     ///
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
-    public func srgb(_ color: Terminal.SRGBColor) -> Terminal.StyledFragment {
+    public func srgb(_ color: SRGBColor) -> StyledTextFragment {
         appendingStyle(foreground: .srgb(color))
     }
 
     /// Returns a copy of the current fragment setting the sRGB color created from the components provided as the foreground color.
     ///
-    /// - Parameter red: the red component.
-    /// - Parameter green: the green component.
-    /// - Parameter blue: the blue component.
+    /// - Parameter red: the red component of the color.
+    /// - Parameter green: the green component of the color.
+    /// - Parameter blue: the blue component of the color.
     /// - Returns: the modified copy.
-    public func srgb(
-        red: Terminal.SRGBColor.Component, green: Terminal.SRGBColor.Component, blue: Terminal.SRGBColor.Component
-    ) -> Terminal.StyledFragment {
+    public func srgb(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
         appendingStyle(foreground: .srgb(.init(red: red, green: green, blue: blue)))
     }
 
     /// Returns a copy of the current fragment setting ANSI red as the background color.
-    public var onRed: Terminal.StyledFragment {
-        appendingStyle(background: .red)
-    }
-
+    public var onRed: StyledTextFragment { appendingStyle(background: .red) }
     /// Returns a copy of the current fragment setting ANSI green as the background color.
-    public var onGreen: Terminal.StyledFragment {
-        appendingStyle(background: .green)
-    }
-
+    public var onGreen: StyledTextFragment { appendingStyle(background: .green) }
     /// Returns a copy of the current fragment setting ANSI yellow as the background color.
-    public var onYellow: Terminal.StyledFragment {
-        appendingStyle(background: .yellow)
-    }
-
+    public var onYellow: StyledTextFragment { appendingStyle(background: .yellow) }
     /// Returns a copy of the current fragment setting ANSI blue as the background color.
-    public var onBlue: Terminal.StyledFragment {
-        appendingStyle(background: .blue)
-    }
-
+    public var onBlue: StyledTextFragment { appendingStyle(background: .blue) }
     /// Returns a copy of the current fragment setting ANSI magenta as the background color.
-    public var onMagenta: Terminal.StyledFragment {
-        appendingStyle(background: .magenta)
-    }
-
+    public var onMagenta: StyledTextFragment { appendingStyle(background: .magenta) }
     /// Returns a copy of the current fragment setting ANSI cyan as the background color.
-    public var onCyan: Terminal.StyledFragment {
-        appendingStyle(background: .cyan)
-    }
-
+    public var onCyan: StyledTextFragment { appendingStyle(background: .cyan) }
     /// Returns a copy of the current fragment setting ANSI bright white as the background color.
     ///
-    /// This color usually matches the terminal foreground. In light themes, it may be replaced with one closer to black.
+    /// This color usually matches the terminal foreground. In light themes, it may be replaced by a near-black shade instead of white.
     ///
-    /// If you're planning to invert the colors of your text, prefer to use the `invertedLayers` effect instead via the method with same name.
-    public var onWhite: Terminal.StyledFragment {
-        appendingStyle(background: .white)
-    }
-
+    /// If you're planning to invert the colors of a text, prefer to use the inverted layers effect.
+    public var onWhite: StyledTextFragment { appendingStyle(background: .white) }
     /// Returns a copy of the current fragment setting ANSI bright black as the background color.
-    public var onGray: Terminal.StyledFragment {
-        appendingStyle(background: .gray)
-    }
+    public var onGray: StyledTextFragment { appendingStyle(background: .gray) }
 
     /// Returns a copy of the current fragment setting the ANSI color provided as the background color.
     ///
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
-    public func onANSI(_ color: Terminal.ANSIColor) -> Terminal.StyledFragment {
+    public func onANSI(_ color: ANSIColor) -> StyledTextFragment {
         appendingStyle(background: .ansi(color))
     }
 
@@ -168,19 +119,17 @@ extension Terminal.StyledFragment {
     ///
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
-    public func onSRGB(_ color: Terminal.SRGBColor) -> Terminal.StyledFragment {
+    public func onSRGB(_ color: SRGBColor) -> StyledTextFragment {
         appendingStyle(background: .srgb(color))
     }
 
     /// Returns a copy of the current fragment setting the sRGB color created from the components provided as the background color.
     ///
-    /// - Parameter red: the red component.
-    /// - Parameter green: the green component.
-    /// - Parameter blue: the blue component.
+    /// - Parameter red: the red component of the color.
+    /// - Parameter green: the green component of the color.
+    /// - Parameter blue: the blue component of the color.
     /// - Returns: the modified copy.
-    public func onSRGB(
-        red: Terminal.SRGBColor.Component, green: Terminal.SRGBColor.Component, blue: Terminal.SRGBColor.Component
-    ) -> Terminal.StyledFragment {
+    public func onSRGB(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
         appendingStyle(background: .srgb(.init(red: red, green: green, blue: blue)))
     }
 
@@ -189,7 +138,7 @@ extension Terminal.StyledFragment {
     /// - Parameter color: the color to be applied.
     /// - Parameter layer: the layer to be affected.
     /// - Returns: the modified copy.
-    public func color(_ color: Terminal.Color, at layer: Terminal.Layer) -> Terminal.StyledFragment {
+    public func color(_ color: Color, at layer: TextLayer) -> StyledTextFragment {
         switch layer {
         case .foreground:
             appendingStyle(foreground: color)
@@ -198,54 +147,36 @@ extension Terminal.StyledFragment {
         }
     }
 
-    /// Returns a copy of the current fragment setting bold as the font weight.
-    public var bold: Terminal.StyledFragment {
-        appendingStyle(weight: .bold)
-    }
+    /// Returns a copy of the current fragment setting bold as the text weight.
+    public var bold: StyledTextFragment { appendingStyle(weight: .bold) }
+    /// Returns a copy of the current fragment setting dim as the text weight.
+    public var dim: StyledTextFragment { appendingStyle(weight: .dim) }
 
-    /// Returns a copy of the current fragment setting dim as the font weight.
-    public var dim: Terminal.StyledFragment {
-        appendingStyle(weight: .dim)
-    }
-
-    /// Returns a copy of the current fragment setting the font weight provided.
+    /// Returns a copy of the current fragment setting the text weight provided.
     ///
     /// - Parameter weight: the weight to be applied.
     /// - Returns: the modified copy.
-    public func weight(_ weight: Terminal.Weight) -> Terminal.StyledFragment {
+    public func weight(_ weight: TextWeight) -> StyledTextFragment {
         appendingStyle(weight: weight)
     }
 
     /// Returns a copy of the current fragment setting italic as an active effect.
-    public var italic: Terminal.StyledFragment {
-        appendingStyle(effects: [.italic])
-    }
-
+    public var italic: StyledTextFragment { appendingStyle(effects: [.italic]) }
     /// Returns a copy of the current fragment setting underline as an active effect.
-    public var underline: Terminal.StyledFragment {
-        appendingStyle(effects: [.underline])
-    }
-
+    public var underline: StyledTextFragment { appendingStyle(effects: [.underline]) }
     /// Returns a copy of the current fragment setting blinking as an active effect.
-    public var blinking: Terminal.StyledFragment {
-        appendingStyle(effects: [.blinking])
-    }
-
+    public var blinking: StyledTextFragment { appendingStyle(effects: [.blinking]) }
     /// Returns a copy of the current fragment setting inverted layers as an active effect.
-    public var invertedLayers: Terminal.StyledFragment {
-        appendingStyle(effects: [.invertedLayers])
-    }
-
+    public var invertedLayers: StyledTextFragment { appendingStyle(effects: [.invertedLayers]) }
     /// Returns a copy of the current fragment setting strikethrough as an active effect.
-    public var strikethrough: Terminal.StyledFragment {
-        appendingStyle(effects: [.strikethrough])
-    }
+    public var strikethrough: StyledTextFragment { appendingStyle(effects: [.strikethrough]) }
 
     /// Returns a copy of the current fragment setting the effects provided as active.
     ///
     /// - Parameter effects: the effects to be activated.
     /// - Returns: the modified copy.
-    public func effects(_ effects: Terminal.Effect...) -> Terminal.StyledFragment {
+    @available(*, deprecated, message: "Use the overload that accepts a Set<TextEffect> or specific effect methods.")
+    public func effects(_ effects: TextEffect...) -> StyledTextFragment {
         appendingStyle(effects: Set(effects))
     }
 
@@ -253,15 +184,15 @@ extension Terminal.StyledFragment {
     ///
     /// - Parameter effects: the effects to be activated.
     /// - Returns: the modified copy.
-    public func effects(_ effects: Set<Terminal.Effect>) -> Terminal.StyledFragment {
+    public func effects(_ effects: Set<TextEffect>) -> StyledTextFragment {
         appendingStyle(effects: effects)
     }
 
     /// Returns a copy of the current fragment setting the padding provided.
     ///
-    /// - Parameter padding: the padding to be used.
+    /// - Parameter padding: the padding to be applied.
     /// - Returns: the modified copy.
-    public func pad(using padding: Terminal.Padding) -> Terminal.StyledFragment {
+    public func pad(using padding: TextPadding) -> StyledTextFragment {
         appendingStyle(padding: padding)
     }
 
@@ -271,9 +202,7 @@ extension Terminal.StyledFragment {
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
     /// - Returns: the modified copy.
-    public func pad(_ alignment: Terminal.Alignment, with character: Character = " ", by length: Terminal.Size)
-        -> Terminal.StyledFragment
-    {
+    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: Terminal.Size) -> StyledTextFragment {
         appendingStyle(padding: .init(alignment, with: character, by: length))
     }
 
@@ -281,7 +210,7 @@ extension Terminal.StyledFragment {
     ///
     /// - Parameter style: the style to be applied.
     /// - Returns: the modified copy.
-    public func style(_ style: Terminal.Style) -> Terminal.StyledFragment {
+    public func style(_ style: TextStyle) -> StyledTextFragment {
         .init(string, style: style)
     }
 }
