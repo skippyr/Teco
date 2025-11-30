@@ -10,8 +10,6 @@
 //  If not available, all rights are reserved to the author.
 //
 
-import Foundation
-
 extension StyledTextFragment {
     fileprivate func appendingStyle(foreground: Color? = nil, background: Color? = nil, weight: TextWeight? = nil, effects: Set<TextEffect>? = nil, padding: TextPadding? = nil) -> StyledTextFragment {
         var style = style
@@ -68,12 +66,22 @@ extension StyledTextFragment {
         appendingStyle(foreground: .ansi(color))
     }
 
+    @available(*, deprecated, renamed: "sRGB")
+    public func srgb(_ color: SRGBColor) -> StyledTextFragment {
+        sRGB(color)
+    }
+
     /// Returns a copy of the current fragment setting the sRGB color provided as the foreground color.
     ///
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
-    public func srgb(_ color: SRGBColor) -> StyledTextFragment {
-        appendingStyle(foreground: .srgb(color))
+    public func sRGB(_ color: SRGBColor) -> StyledTextFragment {
+        appendingStyle(foreground: .sRGB(color))
+    }
+
+    @available(*, deprecated, renamed: "sRGB")
+    public func srgb(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
+        sRGB(red: red, green: green, blue: blue)
     }
 
     /// Returns a copy of the current fragment setting the sRGB color created from the components provided as the foreground color.
@@ -82,8 +90,8 @@ extension StyledTextFragment {
     /// - Parameter green: the green component of the color.
     /// - Parameter blue: the blue component of the color.
     /// - Returns: the modified copy.
-    public func srgb(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
-        appendingStyle(foreground: .srgb(.init(red: red, green: green, blue: blue)))
+    public func sRGB(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
+        appendingStyle(foreground: .sRGB(.init(red: red, green: green, blue: blue)))
     }
 
     /// Returns a copy of the current fragment setting ANSI red as the background color.
@@ -120,7 +128,7 @@ extension StyledTextFragment {
     /// - Parameter color: the color to be applied.
     /// - Returns: the modified copy.
     public func onSRGB(_ color: SRGBColor) -> StyledTextFragment {
-        appendingStyle(background: .srgb(color))
+        appendingStyle(background: .sRGB(color))
     }
 
     /// Returns a copy of the current fragment setting the sRGB color created from the components provided as the background color.
@@ -130,7 +138,7 @@ extension StyledTextFragment {
     /// - Parameter blue: the blue component of the color.
     /// - Returns: the modified copy.
     public func onSRGB(red: SRGBColor.Component, green: SRGBColor.Component, blue: SRGBColor.Component) -> StyledTextFragment {
-        appendingStyle(background: .srgb(.init(red: red, green: green, blue: blue)))
+        appendingStyle(background: .sRGB(.init(red: red, green: green, blue: blue)))
     }
 
     /// Returns a copy of the current fragment setting a color in a text layer.
@@ -164,10 +172,14 @@ extension StyledTextFragment {
     public var italic: StyledTextFragment { appendingStyle(effects: [.italic]) }
     /// Returns a copy of the current fragment setting underline as an active effect.
     public var underline: StyledTextFragment { appendingStyle(effects: [.underline]) }
-    /// Returns a copy of the current fragment setting blinking as an active effect.
-    public var blinking: StyledTextFragment { appendingStyle(effects: [.blinking]) }
-    /// Returns a copy of the current fragment setting inverted layers as an active effect.
-    public var invertedLayers: StyledTextFragment { appendingStyle(effects: [.invertedLayers]) }
+    @available(*, deprecated, renamed: "blink")
+    public var blinking: StyledTextFragment { blink }
+    /// Returns a copy of the current fragment setting blink as an active effect.
+    public var blink: StyledTextFragment { appendingStyle(effects: [.blink]) }
+    @available(*, deprecated, renamed: "swapLayers")
+    public var invertedLayers: StyledTextFragment { swapLayers }
+    /// Returns a copy of the current fragment setting swap layers as an active effect.
+    public var swapLayers: StyledTextFragment { appendingStyle(effects: [.swapLayers]) }
     /// Returns a copy of the current fragment setting strikethrough as an active effect.
     public var strikethrough: StyledTextFragment { appendingStyle(effects: [.strikethrough]) }
 

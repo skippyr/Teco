@@ -10,8 +10,6 @@
 //  If not available, all rights are reserved to the author.
 //
 
-import Foundation
-
 /// A handle to manipulate the emulated terminal.
 @MainActor
 public enum Terminal {
@@ -132,8 +130,8 @@ public enum Terminal {
         switch color {
         case .ansi(let ansi):
             streamWrite("\u{1b}[\(layer.ansi)8;5;\(ansi)m", via: stream)
-        case .srgb(let rgb):
-            streamWrite("\u{1b}[\(layer.ansi)8;2;\(rgb.red);\(rgb.green);\(rgb.blue)m", via: stream)
+        case .srgb(let sRGB), .sRGB(let sRGB):
+            streamWrite("\u{1b}[\(layer.ansi)8;2;\(sRGB.red);\(sRGB.green);\(sRGB.blue)m", via: stream)
         }
     }
 

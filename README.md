@@ -49,6 +49,8 @@ In order to start using it, you must import the `Teco` module at the top of your
 import Teco
 ```
 
+It automatically exports the Foundation framework.
+
 ### Thread Safety
 The primary component introduced into scope is the `Terminal` enum, which is as a handle for manipulating the emulated terminal. To ensure thread safety for building TUI and accessing its cached contents, you can only use it within the main actor concurrency domain—the main thread.
 
@@ -104,12 +106,12 @@ The library adds three new types you need to learn to handle styles:
 - `StyledText`: glues styled fragments together in order to make a full text, possibly with mixed styles.
 
 
-Styles can affect text properties such as foreground and background colors, effects, padding, and font weight. They can be stored in variables and applied to strings using the `style` method, or you can configure each property individually through more specific extensions.
+Styles can affect text properties such as foreground and background colors, effects, padding, and font weight. They can be stored in variables and applied to any type that implements the `CustomStringConvertible` protocol using the `style` method, or you can configure each property individually through more specific extensions. Internally, they wrap their string description.
 
 ```swift
 let customStyle = TextStyle(foreground: .blue)
 Terminal.print("Here Be Dragons!".style(customStyle))
-Terminal.print("Here Be Dragons!".red.bold.underline, via: .error)
+Terminal.print(10.red.bold.underline, via: .error)
 ```
 
 Note that most common way of creating styled fragments and styled texts is by using extensions and string interpolation, respectively:
@@ -183,7 +185,7 @@ let text = "Here Be Dragons!"
 Terminal.print(
     """
     \(text.red) \(text.onRed)
-    \(text.color(.srgb(yellow), at: .foreground))
+    \(text.color(.sRGB(yellow), at: .foreground))
     """
 )
 ```
@@ -206,8 +208,8 @@ The bold weight may be rendered with bold font and/or bright colors, and the dim
 Make your text fancier using effects. Available effects—the most supported ones—are containined within the `TextEffect` enum:
 - `italic`: makes the text use italic font.
 - `underline`: draws a horizontal line below the text.
-- `blinking`: makes the text blink in slow pace.
-- `invertedLayers`: inverts the colors used on the foreground and background layers.
+- `blink`: makes the text blink in slow pace.
+- `swapLayers`: swaps the foreground and background layers, affecting where colors are applied.
 - `strikethrough`: draws a horizontal line through the text.
 
 Apply styles using the `effects` method or computed properties that match the names listed above:
@@ -217,7 +219,7 @@ let customEffects: Set<TextEffect> = [.italic, .underline]
 let text = "Here Be Dragons!"
 Terminal.print(
     """
-    \(text.invertedLayers)
+    \(text.swapLayers)
     \(text.effects(customEffects))
     """
 )
@@ -238,16 +240,16 @@ Terminal.print(
 )
 ```
 
-## Window
+## Screen
 ### Dimensions
-The dimensions of the terminal window can be retrieved for building TUIs that adapt to the available space or ensuring your software has the space it needs to run:
+The dimensions of the terminal screen can be retrieved for building TUIs that adapt to the available space or ensuring your software has the space it needs to run:
 
 ```swift
 guard let dimensions = try? Terminal.dimensions else {
-    throwError("cannot retrieve the dimensions of the terminal window.")
+    throwError("cannot retrieve the dimensions of the terminal screen.")
 }
 guard dimensions >= 80 else {
-    throwError("the terminal window needs to have, at least, 80 columns.")
+    throwError("the terminal screen needs to have, at least, 80 columns.")
 }
 Terminal.print(
     """

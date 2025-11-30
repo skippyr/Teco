@@ -22,8 +22,7 @@ public struct StyledText: ExpressibleByStringInterpolation, CustomStringConverti
     ///
     /// - Parameter item: the item whose description is to be wrapped.
     public init(_ item: Any) {
-        let description = String(describing: item)
-        fragments = description.isEmpty ? [] : [.init(description)]
+        self.init(stringLiteral: String(describing: item))
     }
 
     /// Creates a styled text from a fragment.
@@ -62,8 +61,7 @@ public struct StyledText: ExpressibleByStringInterpolation, CustomStringConverti
         }
 
         public mutating func appendInterpolation(_ value: Any) {
-            let string = String(describing: value)
-            if !string.isEmpty { fragments.append(.init(string)) }
+            appendLiteral(String(describing: value))
         }
     }
 }

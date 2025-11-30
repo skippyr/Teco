@@ -16,10 +16,14 @@ public enum TextEffect {
     case italic
     /// Draws a horizontal line below the text.
     case underline
-    /// Makes the text blink in slow pace.
+    @available(*, deprecated, renamed: "blink")
     case blinking
-    /// Inverts the colors used on the foreground and background layers.
+    /// Makes the text blink in slow pace.
+    case blink
+    @available(*, deprecated, renamed: "swapLayers")
     case invertedLayers
+    /// Swaps the foreground and background layers, affecting where colors are applied.
+    case swapLayers
     /// Draws a horizontal line through the text.
     case strikethrough
 
@@ -29,9 +33,9 @@ public enum TextEffect {
             3
         case .underline:
             4
-        case .blinking:
+        case .blinking, .blink:
             5
-        case .invertedLayers:
+        case .invertedLayers, .swapLayers:
             7
         case .strikethrough:
             9

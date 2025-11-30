@@ -43,8 +43,10 @@ public enum Color {
     ///
     /// - Parameter color: the value of the color.
     case ansi(ANSIColor)
+    @available(*, deprecated, renamed: "sRGB")
+    case srgb(SRGBColor)
     /// An RGB color described within the sRGB color space.
     ///
     /// - Parameter color: the color.
-    case srgb(SRGBColor)
+    case sRGB(SRGBColor)
 }
