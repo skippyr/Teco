@@ -12,16 +12,16 @@
 
 extension String {
     func rawPad(using padding: TextPadding) -> String {
-        let count = max(0, Int(padding.length) - count)
+        let totalPaddingLength = max(0, Int(padding.length) - count)
         switch padding.alignment {
         case .left:
-            return self + String(repeating: padding.character, count: count)
+            return self + String(repeating: padding.character, count: totalPaddingLength)
         case .right:
-            return String(repeating: padding.character, count: count) + self
+            return String(repeating: padding.character, count: totalPaddingLength) + self
         case .center:
-            let leftCount = count / 2
-            let rightCount = count - leftCount
-            return String(repeating: padding.character, count: leftCount) + self + String(repeating: padding.character, count: rightCount)
+            let leftPaddingLength = totalPaddingLength / 2
+            let rightPaddingLength = totalPaddingLength - leftPaddingLength
+            return String(repeating: padding.character, count: leftPaddingLength) + self + String(repeating: padding.character, count: rightPaddingLength)
         }
     }
 }

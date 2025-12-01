@@ -1,11 +1,19 @@
 # Teco
-## About
-A Swift terminal manipulation library for building macOS command-line tools. It requires Swift 6.2 and can target macOS 14 Sonoma or later.
+<img alt="" src="Assets/FrameworkIcon.png" width="90" />
 
-Tailored for the ecossystem, where the graphical interface rules, it's perfect for general-purpose tools: those that parse arguments, write styled output with simple TUI, and have minimal user interactions. Intentionally encouraging developers to use SwiftUI for anything beyond that.
+## About
+A playful Swift 6.2 terminal manipulation library for building command-line tools for macOS 14 Sonoma or later.
 
 ## Install
 ### Swift Package Manager
+- Ensure your package supports, at least, the macOS 14 Sonoma platform:
+
+```swift
+platforms: [
+    .macOS(.v14)
+]
+```
+
 - Add it to your package dependencies:
 
 ```swift
@@ -28,6 +36,7 @@ dependencies: [
 
 ### Xcode Project
 - Open your target settings.
+- Ensure your target has, at least, macOS 14 Sonoma as the minimum deployment version.
 - Click on the `+` button under the `General > Frameworks and Libraries` section.
 - Use the `Add Other...` dropdown menu at the bottom left corner, selecting the `Add Package Dependency...` option.
 - Use the `Search or Enter Package URL` search bar at the top right corner to search for the `https://github.com/skippyr/Teco` repository.
@@ -40,6 +49,8 @@ This section will give you an overview about the library. For more details, refe
 
 > [!IMPORTANT]
 > Whenever you're using this library, debug your software using the Terminal app instead of Xcode, because its embedded console doesn't support any of the added features.
+>
+> Also ensure its profiles declares the terminal as `xterm-256color` under its settings, at `Profiles > Advanced > Terminfo > Declare terminal as:`.
 
 
 ### Import
@@ -52,7 +63,7 @@ import Teco
 It automatically exports the Foundation framework.
 
 ### Thread Safety
-The primary component introduced into scope is the `Terminal` enum, which is as a handle for manipulating the emulated terminal. To ensure thread safety for building TUI and accessing its cached contents, you can only use it within the main actor concurrency domain—the main thread.
+The primary component introduced into scope is the `Terminal` enum, which is as a handler for manipulating the emulated terminal. To ensure thread safety for building TUI and accessing its cached contents, you can only use it within the main actor concurrency domain—the main thread.
 
 Take advantage of modern annotations such as `@main` and `@MainActor` in your software to make it thread safer and be able to use the library without too much ceremony.
 
@@ -132,12 +143,13 @@ let styledText: StyledText = "\("Here".red) \("Be".onGreen.bold) \(styledFragmen
 > [!CAUTION]
 > Nesting styles within string interpolations is possible, but is error prone, because, without type hints, Swift will cast your string literals to `String` instead of `StyledText`.
 
-`StyledText` is the perfect type to pass as function parameters. Convert styled fragments and strings to it using its constructor. String literals can be automatically converted if that type is made explicit or implicitly deductible by the context.
+`StyledText` is the perfect type to pass as function parameters. Convert styled fragments and strings to it using its initalizer. String literals can be automatically converted if that type is made explicit or implicitly deductible by the context.
 
 ```swift
 @MainActor
-static func logError(_ message: StyledText) {
+static func throwError(_ message: StyledText) -> Never {
     Terminal.print("\("error:".red.bold) \(message)", via: .error)
+    exit(EXIT_FAILURE)
 }
 ```
 
@@ -149,13 +161,18 @@ let styledTextFromString = StyledText(string)
 let styledTextFromLiteral: StyledText = "Here Be Dragons!"
 ```
 
-Strings can also be converted to styled fragments via its constructor, though this is usually unecessary. When not using extension methods, the resulting fragments have blank styles. Internally, styled text invoke it when handling the interpolations of strings and literals.
+Strings can also be converted to styled fragments via its initalizer, though this is usually unecessary. When not using extension methods, the resulting fragments have blank styles. Internally, styled text invoke it when handling the interpolations of strings and literals.
 
-Use the `string` computed property to access the underlying text of a styled fragment or styled text. Fragments return the string they are wrapping, while styled texts concatenate the text of their fragments:
+Use the `string` computed property to access the underlying text of a styled fragment or styled text. Fragments return the string they are wrapping, while styled texts concatenate the text of their fragments. If you just need the length of the string, prefer to use `count`—as it avoid heap allocations:
 
 ```swift
 let message = "Here Be Dragons!".red.bold
-Terminal.print("Total Characters: \(message.string.count).")
+Terminal.print(
+    """
+    Total Characters: \(message.count)
+    Has Dragons: \(message.string.contains("Dragons")).
+    """
+)
 ```
 
 #### Colors
@@ -172,10 +189,12 @@ An `ANSIColor` is a typealias for an `UInt8` value. The first 16 colors of this 
 - `.white`: the ANSI bright white color (same as `.ansi(15)`).
 - `.gray`: the ANSI bright black color (same as `.ansi(8)`).
 
-An `SRGBColor` color contains the RGB components of a color defined within the sRGB color space, and it can be created using its constructor:
+An `SRGBColor` color contains the RGB components of a color defined within the sRGB color space, and it can be created using its initalizer. You can even use the `#colorLiteral` macro to have access to a color palette on Xcode/VSCode:
 
 ```swift
 let yellow = SRGBColor(red: 255, green: 255, blue: 0)
+let red = SRGBColor(hex: 0xff0000)!
+let purple = SRGBColor(#colorLiteral(/* (...) */))!
 ```
 
 Apply colors using the extension methods `ansi`, `onANSI`, `sRGB`, `onSRGB`, `color` or one with the name of an ANSI color previously mentioned. The prefix `on` is used for methods that apply to the background.
@@ -245,7 +264,7 @@ Terminal.print(
 The dimensions of the terminal screen can be retrieved for building TUIs that adapt to the available space or ensuring your software has the space it needs to run:
 
 ```swift
-guard let dimensions = try? Terminal.dimensions else {
+guard let dimensions = try? Terminal.screenDimensions else {
     throwError("cannot retrieve the dimensions of the terminal screen.")
 }
 guard dimensions >= 80 else {

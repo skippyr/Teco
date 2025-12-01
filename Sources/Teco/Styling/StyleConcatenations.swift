@@ -14,7 +14,15 @@ public func + (lhs: StyledTextFragment, rhs: StyledTextFragment) -> StyledText {
     "\(lhs)\(rhs)"
 }
 
+public func += (lhs: StyledTextFragment, rhs: StyledTextFragment) -> StyledText {
+    "\(lhs)\(rhs)"
+}
+
 public func + (lhs: StyledTextFragment, rhs: StyledText) -> StyledText {
+    "\(lhs)\(rhs)"
+}
+
+public func += (lhs: StyledTextFragment, rhs: StyledText) -> StyledText {
     "\(lhs)\(rhs)"
 }
 
@@ -22,6 +30,14 @@ public func + (lhs: StyledText, rhs: StyledTextFragment) -> StyledText {
     "\(lhs)\(rhs)"
 }
 
+public func += (lhs: StyledText, rhs: StyledTextFragment) -> StyledText {
+    "\(lhs)\(rhs)"
+}
+
 public func + (lhs: StyledText, rhs: StyledText) -> StyledText {
+    "\(lhs)\(rhs)"
+}
+
+public func += (lhs: StyledText, rhs: StyledText) -> StyledText {
     "\(lhs)\(rhs)"
 }

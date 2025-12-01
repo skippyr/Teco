@@ -17,6 +17,14 @@ public struct StyledText: ExpressibleByStringInterpolation, CustomStringConverti
     /// Returns the concatenation of the text of all its fragments, applying custom padding if described.
     public var string: String { fragments.map(\.string).joined() }
     public var description: String { string }
+    /// Returns the sum of the length of the string of all of its fragments, including custom padding if they describe.
+    ///
+    /// This method is better than using `string.count`, because it doesn't perform a heap allocations.
+    public var count: Int {
+        fragments.reduce(0) { count, fragment in
+            count + fragment.count
+        }
+    }
 
     /// Creates a styled text from the description of an `Any` type.
     ///
@@ -30,6 +38,13 @@ public struct StyledText: ExpressibleByStringInterpolation, CustomStringConverti
     /// - Parameter fragment: the fragment to be considered.
     public init(_ fragment: StyledTextFragment) {
         fragments = fragment.string.isEmpty ? [] : [fragment]
+    }
+
+    /// Creates a styled text from a list of fragments.
+    ///
+    /// - Parameter fragments: the fragments to be considered.
+    public init(_ fragments: [StyledTextFragment]) {
+        self.fragments = fragments
     }
 
     public init(stringLiteral: String) {

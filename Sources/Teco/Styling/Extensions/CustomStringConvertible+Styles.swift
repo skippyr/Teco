@@ -163,10 +163,6 @@ extension CustomStringConvertible {
     /// Creates a styled text fragment from the description of the current instance, setting strikethrough as an active effect.
     public var strikethrough: StyledTextFragment { .init(description, style: .init(effects: [.strikethrough])) }
 
-    /// Creates a styled text fragment from the description of the current instance, setting the effects provided as active.
-    ///
-    /// - Parameter effects: the effects to be activated.
-    /// - Returns: the fragment.
     @available(*, deprecated, message: "Use the overload that accepts a Set<TextEffect> or specific effect methods.")
     public func effects(_ effects: TextEffect...) -> StyledTextFragment {
         .init(description, style: .init(effects: Set(effects)))
@@ -194,7 +190,7 @@ extension CustomStringConvertible {
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
     /// - Returns: the fragment.
-    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: Terminal.Size) -> StyledTextFragment {
+    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledTextFragment {
         .init(description, style: .init(padding: .init(alignment, with: character, by: length)))
     }
 

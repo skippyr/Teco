@@ -30,6 +30,8 @@ public struct StyledTextFragment: CustomStringConvertible {
         set { _string = newValue }
     }
     public var description: String { string }
+    /// Returns the length of the string being wrapped.
+    public var count: Int { string.count }
 
     /// Creates a fragment from a string.
     ///

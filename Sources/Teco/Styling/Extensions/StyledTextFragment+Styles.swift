@@ -183,10 +183,6 @@ extension StyledTextFragment {
     /// Returns a copy of the current fragment setting strikethrough as an active effect.
     public var strikethrough: StyledTextFragment { appendingStyle(effects: [.strikethrough]) }
 
-    /// Returns a copy of the current fragment setting the effects provided as active.
-    ///
-    /// - Parameter effects: the effects to be activated.
-    /// - Returns: the modified copy.
     @available(*, deprecated, message: "Use the overload that accepts a Set<TextEffect> or specific effect methods.")
     public func effects(_ effects: TextEffect...) -> StyledTextFragment {
         appendingStyle(effects: Set(effects))
@@ -214,7 +210,7 @@ extension StyledTextFragment {
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
     /// - Returns: the modified copy.
-    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: Terminal.Size) -> StyledTextFragment {
+    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledTextFragment {
         appendingStyle(padding: .init(alignment, with: character, by: length))
     }
 

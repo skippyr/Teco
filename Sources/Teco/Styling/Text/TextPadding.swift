@@ -15,7 +15,7 @@ public struct TextPadding {
     /// The character to pad with.
     public var character: Character
     /// The length for the padding, including the text area.
-    public var length: Terminal.Size
+    public var length: CellUnit
     /// The alignment for the text being padded.
     public var alignment: TextAlignment
 
@@ -24,7 +24,7 @@ public struct TextPadding {
     /// - Parameter alignment: the alignment for the text being padded.
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
-    public init(_ alignment: TextAlignment, with character: Character = " ", by length: Terminal.Size) {
+    public init(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) {
         self.alignment = alignment
         self.character = character
         self.length = length

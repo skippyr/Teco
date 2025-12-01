@@ -1,5 +1,5 @@
 //
-//  WritableStream.swift
+//  CursorAppearance.swift
 //  Part of the Teco project.
 //
 //  Created by Sherman Barros <skippyr.developer@icloud.com>
@@ -10,10 +10,7 @@
 //  If not available, all rights are reserved to the author.
 //
 
-/// Contains the terminal streams that can be written to.
-public enum WritableStream {
-    /// The standard output stream (`stdout`). Used for general output and TUI, it's line-buffered.
-    case output
-    /// The standard error stream (`stderr`). Used for the output of messages, it's unbuffered.
-    case error
+enum CursorAppearance {
+    case withoutShape(visible: Bool)
+    case withShape(shape: CursorShape, visible: Bool, blink: Bool)
 }
