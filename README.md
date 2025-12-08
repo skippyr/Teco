@@ -1,12 +1,12 @@
-# Teco
+# Teco (Terminal Control Operations)
 <img alt="" src="Assets/FrameworkIcon.png" width="90" />
 
 ## About
-A playful Swift 6.2 terminal manipulation library for building command-line tools for macOS 14 Sonoma or later.
+A playful Swift 6.2 terminal manipulation toolkit for building command-line tools for macOS 14 (Sonoma) or later.
 
 ## Install
 ### Swift Package Manager
-- Ensure your package supports, at least, the macOS 14 Sonoma platform:
+- Ensure your package supports, at least, the macOS 14 (Sonoma) platform:
 
 ```swift
 platforms: [
@@ -36,7 +36,7 @@ dependencies: [
 
 ### Xcode Project
 - Open your target settings.
-- Ensure your target has, at least, macOS 14 Sonoma as the minimum deployment version.
+- Ensure your target has, at least, macOS 14 (Sonoma) as the minimum deployment version.
 - Click on the `+` button under the `General > Frameworks and Libraries` section.
 - Use the `Add Other...` dropdown menu at the bottom left corner, selecting the `Add Package Dependency...` option.
 - Use the `Search or Enter Package URL` search bar at the top right corner to search for the `https://github.com/skippyr/Teco` repository.
@@ -107,6 +107,13 @@ guard !Terminal.isInputRedirected else {
 guard !Terminal.isOutputRedirected && !Terminal.isErrorRedirected else {
     throwError("the output streams cannot be redirected.")
 }
+```
+
+#### Buffers
+If necessary, for example, when writing in a loop without outputing the newline sequence, you can use the `Terminal.flushOutputBuffer()` method to flush the terminal output stream buffer contents:
+
+```swift
+Terminal.flushOutputBuffer()
 ```
 
 ### Styles
@@ -245,18 +252,38 @@ Terminal.print(
 ```
 
 #### Padding
-Align texts in your TUIs using the `pad` method, specifying the alignment for the text, the character to pad with, and how much cells to have filled, including your text area:
+Align texts in your TUIs using the `padding` method, specifying the alignment for the text, the character to pad with, and how much cells to have filled, including your text area:
 
 ```swift
-let customPadding = TextPadding(.left, by: 80)
+let customPadding = TextPadding(align: .left, upTo: 80)
 let text = "Here Be Dragons!"
 Terminal.print(
     """
-    \(text.onMagenta.pad(.center, by: 80))
-    \(text.onYellow.pad(using: customPadding))
-    \(text.onBlue.pad(.right, with: "-", by: 80))
+    \(text.onMagenta.padding(align: .center, upTo: 80))
+    \(text.onYellow.padding(customPadding))
+    \(text.onBlue.padding(align: .right, with: "-", upTo: 80))
     """
 )
+```
+
+## Cursor
+### Appearance
+Change the terminal cursor shape and visibility using the `Terminal.withCursor` method. It maintains an internal stack to track all applied cursor states, allowing nested changes and ensuring that each scope automatically restores the previous appearance when it ends.
+
+In order for the new cursor appearance to be seen, the operation following its set must last long enough, such as to wait for user input or to await for resources to become ready:
+
+```swift
+Terminal.print("Press \("[Enter]".yellow) to advance the steps:")
+Terminal.withCursor(.verticalBar, blink: false) {
+    Terminal.print("Steady Vertical Bar ", terminator: "")
+    _ = readLine()
+    Terminal.withCursor(visible: false) {
+        Terminal.print("Invisible ", terminator: "")
+        _ = readLine()
+    }
+    Terminal.print("Steady Vertical Bar ", terminator: "")
+    _ = readLine()
+}
 ```
 
 ## Screen
@@ -278,11 +305,44 @@ Terminal.print(
 )
 ```
 
-## Help
-If you need help related to this project, open a new issue in its [issues pages](https://github.com/skippyr/Teco/issues) or send an [e-mail](mailto:skippyr.developer@icloud.com) describing what is going on.
+### Alternate Buffer
+The alternate screen buffer is a separate screen environment your app can use to keep the history and state of the primary one intact. Execute code in the alternate buffer by putting it within the scope of `Terminal.withAlternateScreen(action:)`.
+
+In order for the alternate screen to be seen, the operation performed must last long enough, such as to wait for user input or to await for resources to become ready:
+
+```swift
+try Terminal.withAlternateScreen {
+    Terminal.print(
+        """
+        Here Be Dragons!
+        Press \("[Return]".yellow) to exit.
+        """
+    )
+    _ = readLine()
+}
+```
+
+## Clearing
+Clear a specific region of the terminal—either the entire screen (`.screen`) or just the current line (`.line`)—to refresh the views in your TUIs. Each region defines a corresponding cursor restore position which gets set after clearing.
+
+```swift
+try Terminal.clear() // same as Terminal.clear(.screen)
+try Terminal.clear(.screen)
+try Terminal.clear(.line)
+```
+
+## Bell
+Ring the terminal bell using the `Terminal.ringBell()` method, possibly making the terminal dock icon bounce, emit the alert sound, show a symbol in the interface, and/or flash the screen.
+
+```swift
+Terminal.ringBell()
+```
+
+## Support
+If you need help with this project, you can [open a new issue](https://github.com/skippyr/Teco/issues/new) or [send an email](mailto:skippyr.developer@icloud.com) describing the problem in detail.
 
 ## Contributing
-This project is open to review and possibly accept contributions in the form of bug reports and suggestions. If you are interested, send your contribution to its [pull requests page](https://github.com/skippyr/Teco/pulls) or via [e-mail](mailto:skippyr.developer@icloud.com).
+Feel free to share suggestions or propose solutions that could help improve this project. If something catches your interest, you're welcome to open a new issue or contribute to an existing one via its [issues page](https://github.com/skippyr/Teco/issues).
 
 ## Copyright
-This software is licensed under the MIT License. Refer to the `LICENSE` file that comes in its source code for more details.
+This software is distributed under the MIT License. For complete terms, see the accompanying `LICENSE` file included in the source code. When applicable, a `NOTICE` file may also be provided to acknowledge copyrights or other attributions for third-party components.

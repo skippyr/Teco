@@ -1,13 +1,12 @@
 //
-//  CustomStringConvertible+Styles.swift
+//  File: CustomStringConvertible+Styles.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
 extension CustomStringConvertible {
@@ -176,12 +175,22 @@ extension CustomStringConvertible {
         .init(description, style: .init(effects: effects))
     }
 
+    @available(*, deprecated, renamed: "padding(_:)")
+    public func pad(using padding: TextPadding) -> StyledTextFragment {
+        self.padding(padding)
+    }
+
     /// Creates a styled text fragment from the description of the current instance, setting the padding provided.
     ///
     /// - Parameter padding: the padding to be applied.
     /// - Returns: the fragment.
-    public func pad(using padding: TextPadding) -> StyledTextFragment {
+    public func padding(_ padding: TextPadding) -> StyledTextFragment {
         .init(description, style: .init(padding: padding))
+    }
+
+    @available(*, deprecated, renamed: "padding(align:with:upTo:)")
+    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledTextFragment {
+        padding(align: alignment, with: character, upTo: length)
     }
 
     /// Creates a styled text fragment from the description of the current instance, setting the padding created from the components provided.
@@ -190,8 +199,8 @@ extension CustomStringConvertible {
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
     /// - Returns: the fragment.
-    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledTextFragment {
-        .init(description, style: .init(padding: .init(alignment, with: character, by: length)))
+    public func padding(align alignment: TextAlignment, with character: Character = " ", upTo length: CellUnit) -> StyledTextFragment {
+        .init(description, style: .init(padding: .init(align: alignment, with: character, upTo: length)))
     }
 
     /// Creates a styled text fragment from the description of the current instance, setting the style provided.

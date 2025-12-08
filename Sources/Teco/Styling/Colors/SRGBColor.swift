@@ -1,13 +1,12 @@
 //
-//  SRGBColor.swift
+//  File: SRGBColor.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
 import AppKit
@@ -23,7 +22,7 @@ public struct SRGBColor {
 
     /// Returns the color representation in HEX format, uppercased, zero-padded to 6 characters, and without a prefix symbol (eg.: `FF0000`).
     public var hexDescription: String {
-        String(format: "%06X", HEXColor(red << 16) | HEXColor(green << 8) | HEXColor(blue))
+        String(format: "%06X", HEXColor(red) << 16 | HEXColor(green) << 8 | HEXColor(blue))
     }
 
     /// Creates an sRGB color from its components.

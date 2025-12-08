@@ -1,13 +1,12 @@
 //
-//  StyledText+Styles.swift
+//  File: StyledText+Styles.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
 extension StyledText {
@@ -173,15 +172,20 @@ extension StyledText {
         fromCopiedFragments { $0.effects(effects) }
     }
 
+    @available(*, deprecated, renamed: "padding(_:)")
+    public func pad(using padding: TextPadding) -> StyledText {
+        self.padding(padding)
+    }
+
     /// Creates a copy of the styled text, setting the padding provided.
     ///
     /// Depending on the amount of fragments available, the algorithm may apply the padding to only one fragment or split between the ones at the edges. Existing padding in the affected fragments may be removed or modified.
     ///
     /// - Parameter padding: the padding to be applied.
     /// - Returns: the copy.
-    public func pad(using padding: TextPadding) -> StyledText {
+    public func padding(_ padding: TextPadding) -> StyledText {
         guard fragments.count > 1 else {
-            return StyledText(fragments.first!.pad(using: padding))
+            return StyledText(fragments.first!.padding(padding))
         }
         var fragments = self.fragments
         let lastOffset = fragments.count - 1
@@ -193,16 +197,21 @@ extension StyledText {
             let totalPaddingLength = max(0, Int(padding.length) - stringCount)
             let leftPaddingLength = totalPaddingLength / 2
             let rightPaddingLength = totalPaddingLength - leftPaddingLength
-            fragments[0].style.padding = .init(.right, by: CellUnit(leftPaddingLength + fragments[0].count))
-            fragments[lastOffset].style.padding = .init(.left, by: CellUnit(rightPaddingLength + fragments[lastOffset].count))
+            fragments[0].style.padding = .init(align: .right, upTo: CellUnit(leftPaddingLength + fragments[0].count))
+            fragments[lastOffset].style.padding = .init(align: .left, upTo: CellUnit(rightPaddingLength + fragments[lastOffset].count))
         case let alignment:
             let paddingLength = Int(padding.length) - stringCount
             if paddingLength > 0 {
                 let offset = alignment == .left ? lastOffset : 0
-                fragments[offset].style.padding = .init(alignment, by: CellUnit(paddingLength + fragments[offset].count))
+                fragments[offset].style.padding = .init(align: alignment, upTo: CellUnit(paddingLength + fragments[offset].count))
             }
         }
         return StyledText(fragments)
+    }
+
+    @available(*, deprecated, renamed: "padding(align:with:upTo:)")
+    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledText {
+        padding(align: alignment, with: character, upTo: length)
     }
 
     /// Creates a copy of the styled text, setting the padding created from the components provided.
@@ -213,8 +222,8 @@ extension StyledText {
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
     /// - Returns: the copy.
-    public func pad(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) -> StyledText {
-        pad(using: .init(alignment, with: character, by: length))
+    public func padding(align alignment: TextAlignment, with character: Character = " ", upTo length: CellUnit) -> StyledText {
+        padding(.init(align: alignment, with: character, upTo: length))
     }
 
     /// Creates a copy of the styled text, setting the style provided.
@@ -230,7 +239,7 @@ extension StyledText {
         styleWithoutPadding.padding = nil
         let styledText = fromCopiedFragments { $0.style(styleWithoutPadding) }
         return if let padding = style.padding {
-            styledText.pad(using: padding)
+            styledText.padding(padding)
         } else {
             styledText
         }

@@ -1,13 +1,12 @@
 //
-//  Coordinate.swift
+//  File: Coordinate.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
 /// Represents a coordinate within the terminal screen cell-grid.

@@ -1,13 +1,12 @@
 //
-//  TextPadding.swift
+//  File: TextPadding.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
 /// Contains the information required to perform text padding within the terminal.
@@ -19,12 +18,19 @@ public struct TextPadding {
     /// The alignment for the text being padded.
     public var alignment: TextAlignment
 
+    @available(*, deprecated, renamed: "init(align:with:upTo:)")
+    public init(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) {
+        self.alignment = alignment
+        self.character = character
+        self.length = length
+    }
+
     /// Creates new information about padding from its component.
     ///
     /// - Parameter alignment: the alignment for the text being padded.
     /// - Parameter character: the character to pad with.
     /// - Parameter length: the length for the padding, including the text area.
-    public init(_ alignment: TextAlignment, with character: Character = " ", by length: CellUnit) {
+    public init(align alignment: TextAlignment, with character: Character = " ", upTo length: CellUnit) {
         self.alignment = alignment
         self.character = character
         self.length = length

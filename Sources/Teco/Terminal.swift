@@ -1,16 +1,15 @@
 //
-//  Terminal.swift
+//  File: Terminal.swift
 //  Part of the Teco project.
 //
-//  Created by Sherman Barros <skippyr.developer@icloud.com>
-//  Visit my website: https://dragonscave.xyz.
-//  Follow me on GitHub: https://github.com/skippyr.
+//  Created by Sherman Barros (skippyr.developer@icloud.com)
+//  Connect: https://dragonscave.xyz | GitHub: https://github.com/skippyr
 //
-//  Refer to the LICENSE file that comes in its source code for more details.
-//  If not available, all rights are reserved to the author.
+//  Refer to the LICENSE file included with this source code for full terms.
+//  See the NOTICE file, if included, for third-party attributions.
 //
 
-/// A handler to manipulate the emulated terminal.
+/// A handle to manipulate the emulated terminal.
 @MainActor
 public enum Terminal {
     /// A boolean that states the terminal input stream is being redirected.
@@ -53,7 +52,7 @@ public enum Terminal {
 
     private static func streamWrite(_ message: String, via stream: Teco.WritableStream) {
         if stream == .error && !isErrorRedirected && outputCachesANSI {
-            flushOutput()
+            flushOutputBuffer()
         }
         fputs(message, stream == .output ? stdout : stderr)
         ansiPrefersOutput = stream == .output
@@ -90,7 +89,7 @@ public enum Terminal {
     }
 
     /// Flushes the terminal output stream buffer, writing all content it might be caching.
-    private static func flushOutput() {
+    public static func flushOutputBuffer() {
         fflush(stdout)
         outputCachesANSI = false
     }
@@ -252,7 +251,7 @@ public enum Terminal {
     /// - Parameter action: the closure.
     /// - Returns: any value returned by the closure.
     /// - Throws: it rethrows any error thrown by the closure.
-    private static func withCursor<T>(visible: Bool, action: () throws -> T) rethrows -> T {
+    public static func withCursor<T>(visible: Bool, action: () throws -> T) rethrows -> T {
         let appearance: CursorAppearance =
             if let last = cursorAppearanceStack.last, case .withShape(let shape, _, let blink) = last {
                 .withShape(shape: shape, visible: visible, blink: blink)
@@ -269,7 +268,7 @@ public enum Terminal {
     /// - Parameter action: the closure to be executed.
     /// - Returns: any value returned by the closure.
     /// - Throws: it rethrows any error thrown by the closure.
-    private static func withCursor<T>(_ shape: CursorShape, blink: Bool = true, action: () throws -> T) rethrows -> T {
+    public static func withCursor<T>(_ shape: CursorShape, blink: Bool = true, action: () throws -> T) rethrows -> T {
         return try withCursor(appearance: .withShape(shape: shape, visible: true, blink: blink), action: action)
     }
 
@@ -318,13 +317,12 @@ public enum Terminal {
     ///
     /// In order for the alternate screen to be seen, the operation performed must last long enough, such as to wait for user input or to await for resources to become ready.
     ///
-    /// - Parameter title: an optional title to set for the screen, which may appear in the title bar or tab bar.
     /// - Parameter action: the closure to be executed.
     /// - Throws:
     ///   - `Terminal.Error.unsupportedFeature`: if the emulated terminal doesn't support the alternate screen feature.
     ///   - `Terminal.Error.streamRedirection`: if all writable streams are redirected, not allowing the write of the required ANSI sequences.
     ///   - `Terminal.Error.alternateScreenInUse`: if the alternate screen is already opened.
-    private static func withAlternateScreen<T>(_ title: String? = nil, action: () throws -> T) throws -> T {
+    public static func withAlternateScreen<T>(action: () throws -> T) throws -> T {
         guard !isDumb else {
             throw Error.unsupportedFeature
         }
@@ -332,26 +330,20 @@ public enum Terminal {
             throw Error.alternateScreenInUse
         }
         try ansiWrite("\u{1b}[?1049h\u{1b}[2J\u{1b}[H", via: nil)
-        if let title {
-            try ansiWrite("\u{1b}]0;\(title)\u{7}", via: nil)
-        }
         isAlternateScreenOpened = true
         defer {
             try? ansiWrite("\u{1b}[?1049l", via: nil)
-            if title != nil {
-                try? ansiWrite("\u{1b}]0;\u{7}", via: nil)
-            }
             isAlternateScreenOpened = false
         }
         return try action()
     }
 
-    /// Clears a region of the terminal and reset the cursor to its corresponding restore position.
+    /// Clears a region of the terminal and resets the cursor to a corresponding restore position.
     ///
     /// - Parameter region: the region to be cleared.
     /// - Throws:
     ///   - `Terminal.Error.unsupportedFeature`: if the emulated terminal doesn't support the cleaning feature.
-    private static func clear(_ region: CleaningRegion = .screen) throws {
+    public static func clear(_ region: CleaningRegion = .screen) throws {
         guard !isDumb else {
             throw Error.unsupportedFeature
         }
@@ -359,7 +351,7 @@ public enum Terminal {
     }
 
     /// Rings the terminal bell possibly making the terminal dock icon bounce, emit the alert sound, show a symbol in the interface, and/or flash the screen.
-    private static func ringBell() {
+    public static func ringBell() {
         try? ansiWrite("\u{7}", via: nil)
     }
 
