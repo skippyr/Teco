@@ -9,4 +9,4 @@
 //  See the NOTICE file, if included, for third-party attributions.
 //
 
-@_exported import Foundation
+@_documentation(visibility: private) @_exported import Foundation

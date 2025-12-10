@@ -63,6 +63,8 @@ public struct SRGBColor {
 
     /// Creates an sRGB color from the components of an `NSColor`. The alpha channel is ignored.
     ///
+    /// This initializer exists to give support for the `#colorLiteral` macro.
+    ///
     /// - Parameter color: the color to be considered.
     /// - Returns: the sRGB color or `nil` if the `NSColor` instance cannot be represented within the sRGB color space.
     public init?(_ color: NSColor) {

@@ -106,8 +106,7 @@ public enum Terminal {
             attributes.c_lflag |= UInt(ICANON) | UInt(ECHO) | UInt(ISIG)
             tcsetattr(STDIN_FILENO, TCSANOW, &attributes)
         }
-        let result = try action()
-        return result
+        return try action()
     }
 
     /// Clears all the events possibly cached in the terminal input stream buffer.
@@ -367,32 +366,32 @@ public enum Terminal {
         case streamRedirection
     }
 
-    @available(*, deprecated, message: "Use CellUnit defined in the module top-level.")
+    @available(*, deprecated, message: "Use CellUnit defined in the module's top-level.")
     public typealias Size = CellUnit
-    @available(*, deprecated, message: "Use WritableStream defined in the module top-level.")
+    @available(*, deprecated, message: "Use WritableStream defined in the module's top-level.")
     public typealias WritableStream = Teco.WritableStream
-    @available(*, deprecated, message: "Use TextLayer defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextLayer defined in the module's top-level.")
     public typealias Layer = TextLayer
-    @available(*, deprecated, message: "Use Color defined in the module top-level.")
+    @available(*, deprecated, message: "Use Color defined in the module's top-level.")
     public typealias Color = Teco.Color
-    @available(*, deprecated, message: "Use ANSIColor defined in the module top-level.")
+    @available(*, deprecated, message: "Use ANSIColor defined in the module's top-level.")
     public typealias ANSIColor = Teco.ANSIColor
-    @available(*, deprecated, message: "Use SRGBColor defined in the module top-level.")
+    @available(*, deprecated, message: "Use SRGBColor defined in the module's top-level.")
     public typealias SRGBColor = Teco.SRGBColor
-    @available(*, deprecated, message: "Use TextWeight defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextWeight defined in the module's top-level.")
     public typealias Weight = TextWeight
-    @available(*, deprecated, message: "Use TextEffect defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextEffect defined in the module's top-level.")
     public typealias Effect = TextEffect
-    @available(*, deprecated, message: "Use TextAlignment defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextAlignment defined in the module's top-level.")
     public typealias Alignment = TextAlignment
-    @available(*, deprecated, message: "Use TextPadding defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextPadding defined in the module's top-level.")
     public typealias Padding = TextPadding
-    @available(*, deprecated, message: "Use TextStyle defined in the module top-level.")
+    @available(*, deprecated, message: "Use TextStyle defined in the module's top-level.")
     public typealias Style = TextStyle
-    @available(*, deprecated, message: "Use StyledTextFragment defined in the module top-level.")
+    @available(*, deprecated, message: "Use StyledTextFragment defined in the module's top-level.")
     public typealias StyledFragment = StyledTextFragment
-    @available(*, deprecated, message: "Use StyledText defined in the module top-level.")
+    @available(*, deprecated, message: "Use StyledText defined in the module's top-level.")
     public typealias StyledString = StyledText
-    @available(*, deprecated, message: "Use Dimensions defined in the module top-level.")
+    @available(*, deprecated, message: "Use Dimensions defined in the module's top-level.")
     public typealias Dimensions = Teco.Dimensions
 }

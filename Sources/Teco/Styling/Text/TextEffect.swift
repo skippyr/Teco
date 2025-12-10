@@ -17,7 +17,7 @@ public enum TextEffect {
     case underline
     @available(*, deprecated, renamed: "blink")
     case blinking
-    /// Makes the text blink in slow pace.
+    /// Makes the text blink at a slow pace.
     case blink
     @available(*, deprecated, renamed: "swapLayers")
     case invertedLayers
