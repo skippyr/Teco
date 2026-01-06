@@ -1,6 +1,14 @@
 <img alt="A framework icon containing a rooster and wheat leaf." src="Assets/FrameworkIcon.png" width="90" />
 
 # Teco
+
+> [!IMPORTANT]
+> **Deprecation Notice**
+>
+> Teco's scope and evolution were not well planned, which led to growing complexity without meaningful benefits. Additionally, the project is being discontinued in favor of a move to GitLab, which offers more suitable features.
+>
+> If you were using [Teco](https://github.com/skippyr/Teco), you should migrate to [RoosterTTY](https://gitlab.com/skippyr/RoosterTTY). It focuses on line-oriented applications and keeps a familiar API, but it is not fully compatible, so some code changes will be required. This repository will remain archived and available for legacy use.
+
 ## About
 A framework that provides the building blocks for creating line-oriented and screen-oriented terminal apps, while delivering a modern and intuitive developer experience.
 
